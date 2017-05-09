@@ -1,0 +1,69 @@
+/*
+   Simple +/-/* expression language; 
+   parser evaluates constant expressions on the fly
+*/
+
+package cup.example;
+
+import java_cup.runtime.*;
+import cup.example.Lexer;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.Object;
+import java.util.*;
+
+parser code {:
+  protected Lexer lexer;
+  private HashMap<String,Integer> symT;
+:}
+
+/* define how to connect to the scanner! */
+init with {:
+  ComplexSymbolFactory f = new ComplexSymbolFactory();
+  symbolFactory = f;
+  File file = new File("input.txt");
+  FileInputStream fis = null;
+  try {
+    fis = new FileInputStream(file);
+  } catch (IOException e) {
+    e.printStackTrace();
+  } 
+  lexer = new Lexer(f,fis);
+  symT = new HashMap<String,Integer>();
+:};
+scan with {: return lexer.next_token(); :};
+
+/* Terminals (tokens returned by the scanner). */
+terminal            SEMI, PLUS, MINUS, TIMES, LPAREN, RPAREN, EQUALS, LET;
+terminal String		ID;
+terminal Integer    NUMBER;        // our scanner provides numbers as integers
+
+/* Non terminals */
+non terminal            stm_list;
+non terminal String		stm;
+non terminal Integer    expr;      // used to store evaluated subexpressions
+
+/* Precedences */
+precedence left PLUS, MINUS;
+precedence left TIMES;
+
+/* The grammar rules */
+
+stm_list	::= stm_list expr:e SEMI		{: System.out.println(e); :}
+				| expr:e SEMI				{: System.out.println(e); :}
+				| stm_list stm SEMI
+				| stm:s SEMI 				
+				;
+
+stm		::= LET ID:i EQUALS expr:e  		{: symT.put(i,e); System.out.println(i+"="+e); :}; 
+       
+expr      	::= expr:e1 PLUS  expr:e2       {: RESULT = e1+e2;        :}
+            	| expr:e1 MINUS expr:e2     {: RESULT = e1-e2;        :}
+             	| expr:e1 TIMES expr:e2     {: RESULT = e1*e2;        :}
+             	| MINUS expr:e              {: RESULT = -e;           :}
+             	| ID:i						{: RESULT = symT.get(i);  :}
+             	| LPAREN expr:e RPAREN	    {: RESULT = e;           :}
+             	| NUMBER:n	                {: RESULT = n;           :}
+             	;
+       
