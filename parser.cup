@@ -40,8 +40,7 @@ terminal String		ID;
 terminal Integer    NUMBER;        // our scanner provides numbers as integers
 
 /* Non terminals */
-non terminal            stm_list;
-non terminal String		stm;
+non terminal            stm_list, stm;
 non terminal Integer    expr;      // used to store evaluated subexpressions
 
 /* Precedences */
