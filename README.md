@@ -1,6 +1,6 @@
 # README #
 
-Uniupo university, Science & Technologic Innovation dept., Language&Translators Lab course Project
+**Uniupo university, Science & Technologic Innovation dept., Language&Translators Lab course Project**
 
 This repository is about a simple example of JCUP and JFLEX using. In this example, a simple new programming language is defined (only declarations, assignments and prints) and then parsed, translated into JAVA and then executed.
 
